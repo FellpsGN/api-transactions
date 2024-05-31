@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
 export async function transactionsRoutes(app: FastifyInstance) {
+
     app.get("/", async () => {
         const transactions = await knex("transactions").select("*");
 
@@ -12,16 +13,29 @@ export async function transactionsRoutes(app: FastifyInstance) {
         };
     });
 
+
     app.get("/:id", async (request) => {
         const getTransactionsParamsSchema = z.object({
             id: z.string().uuid(),
         });
 
         const { id } = getTransactionsParamsSchema.parse(request.params);
-        const transaction = await knex("transactions").where("id", id).first()
+        const transaction = await knex("transactions")
+            .where("id", id)
+            .first()
 
         return { transaction }
     });
+
+
+    app.get("/summary", async () => {
+        const summary = await knex("transactions")
+            .sum("amount", {as: "amount"})
+            .first();
+
+        return { summary }
+    });
+
 
     app.post("/", async (request, reply) => {
         
@@ -33,26 +47,25 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
         const { title, amount, type } = createTransactionBodySchema.parse(request.body);
 
+        let sessionId = request.cookies.sessionId;
+        const sevenDays = 60 * 60 * 24 * 7
+
+        if (!sessionId) {
+            sessionId = randomUUID();
+            reply.cookie("sessionId", sessionId, {
+                path: "/",
+                maxAge: sevenDays
+            });
+        }
+
         await knex("transactions")
             .insert({
                 id: randomUUID(),
                 title: title,
-                amount: type === "credit" ? amount : (amount * -1) 
+                amount: type === "credit" ? amount : (amount * -1),
+                session_id: sessionId 
             });
 
         return reply.status(201).send();
-    });
-    
-    app.get("/insert/exemplo", async () => {
-        
-        const transactions = await knex("transactions")
-            .insert({
-                id: randomUUID(),
-                title: "Transação de teste",
-                amount: 1000
-            })
-            .returning("*");
-    
-        return transactions;
     });
 }
