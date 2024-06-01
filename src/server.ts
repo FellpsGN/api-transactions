@@ -7,7 +7,7 @@ import { transactionsRoutes } from "./routes/transactions";
 const app = fastify();
 
 
-app.register(cookie)
+app.register(cookie);
 app.register(transactionsRoutes, 
     {
         prefix: "transactions"
