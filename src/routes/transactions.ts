@@ -6,8 +6,13 @@ import { checkSessionIdExists } from "../middlewares/check-session-id-exists";
 
 export async function transactionsRoutes(app: FastifyInstance) {
 
+    //criando um pedaço de código para rodar independente da roda que o usuário acessar
+    // app.addHook("preHandler", async (request, reply) => {
+    //     console.log(`[${request.method}] ${request.url}`);
+    // });
+
     app.get("/", { preHandler: [checkSessionIdExists]} ,async (request, reply) => {
-        const { sessionId } = request.cookies
+        const { sessionId } = request.cookies;
         
         const transactions = await knex("transactions").select("*").where("session_id", sessionId);
 

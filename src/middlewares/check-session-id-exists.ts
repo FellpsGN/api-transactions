@@ -8,5 +8,4 @@ export async function checkSessionIdExists(request: FastifyRequest, reply: Fasti
             error: "Unauthorized."
         });
     };
-    console.log("Verificado!");
 };
