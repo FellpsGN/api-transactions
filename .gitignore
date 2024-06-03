@@ -1,4 +1,6 @@
 node_modules
+db/test.db
 db/app.db
 .env
+.env.test
 requisitos.mkd
