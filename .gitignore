@@ -1,6 +1,15 @@
+# Dependencies
 node_modules
-db/test.db
-db/app.db
+
+# Database
+db/*.db
+
+# Environments
 .env
 .env.test
+
+# Build
+build
+
+# Readme
 requisitos.mkd
